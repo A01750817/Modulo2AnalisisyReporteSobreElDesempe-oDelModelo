@@ -1,6 +1,6 @@
 # Ivan Alexander Ramos Ramirez A01750817
-# Módulo 2 Implementación de una técnica de 
-# aprendizaje máquina sin el uso de un framework. (Portafolio Implementación)
+# Módulo 2  Análisis y Reporte sobre 
+#  el desempeño del modelo. (Portafolio Implementación)
 
 import numpy as np
 import pandas as pd
@@ -26,7 +26,7 @@ class NeuralNet:
     
     
     def _randomWeightsHe(self, n_in, n_out):
-        return np.random.randn(n_in, n_out) * (np.sqrt(2.0 / n_in) * 0.5)
+        return np.random.randn(n_in, n_out) * np.sqrt(2.0 / n_in)
 
     def _generateWeight(self):
         self.weights = []
@@ -43,8 +43,16 @@ class NeuralNet:
             n_in = n_out
 
     #TODO: funcion de regularizcion L1,L2 ,Dropout
-    #TODO: more activation functions   
+    def _L2_regularization(self, lambda_reg):
+        l2_sum = sum(np.sum(w ** 2) for w in self.weights)
+        return (lambda_reg / 2) * l2_sum
+    def _L1_regularization(self, lambda_reg):
+        l1_sum = sum(np.sum(np.abs(w)) for w in self.weights)
+        return lambda_reg * l1_sum
+
+    #TODO: more activation functions
     #TODO: MANEJOR DE activacion por capa
+        
 
     #derivadas de las funciones de activacion para el gradiente descendente
     def _sigmoid_derivative(self, z):
@@ -223,7 +231,7 @@ class NeuralNet:
 
 
 
-def stratified_split(X, y, test_size=0.3, seed=42):
+def stratified_split(X, y, test_size=0.15, validation_size=0.15, seed=42):
     rng = np.random.default_rng(seed)
     X = np.asarray(X)
     y = np.asarray(y)
@@ -232,15 +240,17 @@ def stratified_split(X, y, test_size=0.3, seed=42):
     classes, y_idx = np.unique(y, return_inverse=True)
     train_idx = []
     test_idx = []
+    val_idx = []
     for c in range(len(classes)):
         idx_c = np.where(y_idx == c)[0]
         rng.shuffle(idx_c)
         n_test = int(len(idx_c) * test_size)
+        n_val = int(len(idx_c) * validation_size)
         test_idx.extend(idx_c[:n_test])
-        train_idx.extend(idx_c[n_test:])
-    train_idx = np.array(train_idx); test_idx = np.array(test_idx)
-    rng.shuffle(train_idx); rng.shuffle(test_idx)
-    return X[train_idx], X[test_idx], y[train_idx], y[test_idx]
-
+        val_idx.extend(idx_c[n_test:n_test + n_val])
+        train_idx.extend(idx_c[n_test + n_val:])
+    train_idx = np.array(train_idx); test_idx = np.array(test_idx); val_idx = np.array(val_idx)
+    rng.shuffle(train_idx); rng.shuffle(test_idx); rng.shuffle(val_idx)
+    return X[train_idx], X[test_idx], X[val_idx], y[train_idx], y[test_idx], y[val_idx]
 
 
