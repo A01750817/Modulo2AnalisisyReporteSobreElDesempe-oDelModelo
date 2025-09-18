@@ -10,7 +10,7 @@ iris = fetch_ucirepo(id=53)
 
 
 class NeuralNet:
-    def __init__(self, learning_rate, activation_function :str, layer_neurons: list, epoch: int, batch_size: int):
+    def __init__(self, learning_rate, activation_function :str, layer_neurons: list, epoch: int, batch_size: int, regularization_method=None, lambda_reg=None):
         self.learning_rate = learning_rate
         self.activation_function = activation_function
         self.layer_neurons = layer_neurons
@@ -18,6 +18,8 @@ class NeuralNet:
         self.output_layer = None
         self.epoch = epoch
         self.batch_size = batch_size
+        self.regularization_method = regularization_method
+        self.lambda_reg = lambda_reg
     
     def _randomWeightsXavier(self,  n_in, n_out):
         limit = np.sqrt( 6 / (n_in + n_out))
